@@ -19,7 +19,7 @@ def move_ext_to_dirs(path):
                     newpath = os.path.join(ordpath,fileext[1:],f)
                     shutil.move(os.path.join(path,f),newpath)
                     cont += 1
-    print("\nSpostati " + str(cont) + " files ("+ str(totalSize/1024/1024) + " Mb)"+" in " + dire)                             
+    print("\nSpostati " + str(cont) + " files ("+ str(round(totalSize/1024/1024, 2)) + " Mb)"+" in " + dire)                             
     
 
 home = os.path.expanduser('~')
