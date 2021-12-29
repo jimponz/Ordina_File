@@ -26,9 +26,9 @@
    <widget class="QLabel" name="labelTitle">
     <property name="geometry">
      <rect>
-      <x>430</x>
-      <y>10</y>
-      <width>441</width>
+      <x>670</x>
+      <y>0</y>
+      <width>201</width>
       <height>31</height>
      </rect>
     </property>
@@ -48,8 +48,8 @@
    <widget class="QPushButton" name="buttonDirChooser">
     <property name="geometry">
      <rect>
-      <x>1110</x>
-      <y>40</y>
+      <x>1089</x>
+      <y>43</y>
       <width>141</width>
       <height>31</height>
      </rect>
@@ -72,10 +72,10 @@
    <widget class="QLabel" name="labelPath">
     <property name="geometry">
      <rect>
-      <x>200</x>
+      <x>187</x>
       <y>50</y>
-      <width>891</width>
-      <height>21</height>
+      <width>881</width>
+      <height>18</height>
      </rect>
     </property>
     <property name="font">
@@ -102,7 +102,7 @@ color: rgb(255, 255, 255);</string>
       <x>20</x>
       <y>50</y>
       <width>159</width>
-      <height>21</height>
+      <height>18</height>
      </rect>
     </property>
     <property name="font">
@@ -122,7 +122,7 @@ color: rgb(255, 255, 0);</string>
    <widget class="QLabel" name="labelStatus">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>20</x>
       <y>650</y>
       <width>1331</width>
       <height>31</height>
@@ -183,30 +183,6 @@ background-color: rgb(120, 120, 120);</string>
      <string/>
     </property>
    </widget>
-   <widget class="QPushButton" name="buttonRefresh">
-    <property name="geometry">
-     <rect>
-      <x>1270</x>
-      <y>40</y>
-      <width>75</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Verdana</family>
-      <pointsize>10</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgb(214, 214, 0);</string>
-    </property>
-    <property name="text">
-     <string>Aggiorna</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="labelKeys">
     <property name="geometry">
      <rect>
@@ -229,11 +205,11 @@ background-color: rgb(120, 120, 120);</string>
      <string>File selezionato: </string>
     </property>
    </widget>
-   <widget class="QPushButton" name="buttonDelete">
+   <widget class="QPushButton" name="buttonMove">
     <property name="geometry">
      <rect>
-      <x>1240</x>
-      <y>520</y>
+      <x>950</x>
+      <y>530</y>
       <width>111</width>
       <height>31</height>
      </rect>
@@ -256,7 +232,7 @@ background-color: rgb(120, 120, 120);</string>
      <string notr="true">background-color: rgb(214, 214, 0);</string>
     </property>
     <property name="text">
-     <string>Elimina file</string>
+     <string>Sposta file</string>
     </property>
    </widget>
    <widget class="QLabel" name="labelSelected">
@@ -284,9 +260,9 @@ background-color: rgb(120, 120, 120);</string>
    <widget class="QPushButton" name="buttonFolder">
     <property name="geometry">
      <rect>
-      <x>1090</x>
-      <y>520</y>
-      <width>141</width>
+      <x>1238</x>
+      <y>43</y>
+      <width>105</width>
       <height>31</height>
      </rect>
     </property>
@@ -308,14 +284,14 @@ background-color: rgb(120, 120, 120);</string>
      <string notr="true">background-color: rgb(214, 214, 0);</string>
     </property>
     <property name="text">
-     <string>Apri percorso file</string>
+     <string>Apri percorso</string>
     </property>
    </widget>
    <widget class="QPushButton" name="buttonWrite">
     <property name="geometry">
      <rect>
-      <x>920</x>
-      <y>520</y>
+      <x>1190</x>
+      <y>530</y>
       <width>161</width>
       <height>31</height>
      </rect>
@@ -339,6 +315,36 @@ background-color: rgb(120, 120, 120);</string>
     </property>
     <property name="text">
      <string>Scrivi risultati su file</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="buttonOpenFile">
+    <property name="geometry">
+     <rect>
+      <x>1070</x>
+      <y>530</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <family>Verdana</family>
+      <pointsize>10</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(214, 214, 0);</string>
+    </property>
+    <property name="text">
+     <string>Apri file</string>
     </property>
    </widget>
   </widget>

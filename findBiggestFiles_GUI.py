@@ -7,9 +7,11 @@ from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QMessageBox
 
-from inspect_dir_cython import inspect_dir
+import ORDINA_FILE
 
-qtcreator_file  = "findBiggestFiles.ui"
+#from inspect_dir_cython import inspect_dir
+
+qtcreator_file  = "ORDINA_FILE.ui"
 
 Ui_MainWindow, QtBaseClass = uic.loadUiType(qtcreator_file)
 
@@ -37,13 +39,11 @@ class File:
         return "\nPath: " + self.path + "\nSize: " + self.format_bytes(self.size)
 
 
-
 class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     input_dir = os.getcwd()
     dir_size = 0
     selected = ""
     listOfFiles = []
-
 
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
@@ -54,60 +54,147 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.listWidget.itemClicked.connect(self.onClicked)
 
         self.buttonFolder.clicked.connect(self.onClickFolder)
-        self.buttonDelete.clicked.connect(self.onClickDelete)
-        self.buttonWrite.clicked.connect(self.onClickWrite)
+        self.buttonMove.clicked.connect(self.move_to_dirs)
+        self.buttonOpenFile.clicked.connect(self.onClickOpen)
+        #self.buttonWrite.clicked.connect(self.onClickWrite)
 
         self.buttonDirChooser.clicked.connect(self.choose_dir)
-        self.buttonRefresh.clicked.connect(inspect_dir)
+        #self.buttonRefresh.clicked.connect(self.refresh_dir)
 
         self.labelPath.setText(self.input_dir)
         self.labelStatus.setText("Status: Pronto!")
 
-        self.init_dir(self.input_dir)        
+        self.init_dir(self.input_dir)
         
         self.setStyleSheet("MyWindow{ background-color: rgb(54, 54, 54);}")
 
+    def onClickOpen(self):
+        try:
+            if self.selected:
+                os.startfile(self.selected)
+            else:
+                message = "\nStatus: Nessun file selezionato, seleziona un file prima!"
+                self.labelStatus.setText(message)
+        except Exception as ex:
+            message = "\nSi è verificata un'eccezione in onClickOpen " + str(ex)
+            print(message)
+            self.labelStatus.setText(message)
 
-    def onClicked(self,item):
+    def move_to_dirs(self):
+        res = ORDINA_FILE.OrdinaFile(self.input_dir)
+        res.analyze_dir()
+        listMoved = res.move_to_dirs()
+        lenList = len(listMoved)
+
+        labelStatusMessage = ""
+        labelListMessage = ""
+        if lenList > 0:
+            self.listWidget.clear()
+            self.listWidget.addItems(listMoved)
+
+            labelStatusMessage = "Status: " + str(lenList) + " file spostati!"
+            labelListMessage = "I seguenti " + str(lenList) + " file sono stati spostati in questo percorso:"
+        else:
+            self.listWidget.clear()
+            self.listWidget.addItem("Non è stato spostato e nessun file! Controlla il percorso di lavoro!")
+
+            labelListMessage = "Si è verificato un errore nessun file è stato spostato!"
+            labelStatusMessage = "Status: Non è stato spostato nessun file!"
+
+        self.labelList.setText(labelListMessage)
+        self.labelStatus.setText(labelStatusMessage)
+
+    def init_dir(self, input_dir):
+        try:
+            self.listOfFiles.clear()
+            self.listWidget.clear()
+            self.selected = ""
+            self.input_dir = input_dir
+            self.inspect_dir(input_dir)
+
+            self.labelSelected.setText(self.selected)
+            self.labelPath.setText(self.input_dir)
+
+        except Exception as ex:
+            message = "\nSi è verificata un'eccezione in init_dir " + str(ex)
+            print(message)
+            self.labelStatus.setText(message)
+
+    def choose_dir(self):
+        try:
+            self.input_dir = QFileDialog.getExistingDirectory(self, "Scegli la cartella da analizzare", self.input_dir)
+            self.init_dir(self.input_dir)
+
+        except Exception as ex:
+            message = "\nSi è verificata un'eccezione in choose_dir " + str(ex)
+            print(message)
+            self.labelStatus.setText(message)
+
+    def inspect_dir(self, input_dir):
+        try:
+            self.input_dir = input_dir
+            self.labelPath.setText(input_dir)
+
+            res = ORDINA_FILE.OrdinaFile(self.input_dir)
+            res.analyze_dir()
+
+            message = "Status: Analizzando la cartella " + self.input_dir
+            self.labelStatus.setText(message)
+
+            self.listWidget.addItems(res.listOfFiles)
+            lenListOfFiles = len(res.listOfFiles)
+            if lenListOfFiles > 0:
+                self.labelStatus.setText("Status: Pronto!")
+                message = "Nella cartella attuale sono presenti i seguenti " + str(lenListOfFiles) + " file che vorrei spostare:"
+
+                self.labelList.setText(res.message)
+            else:
+                self.listWidget.clear()
+                self.listWidget.addItem("Non è stato trovato nessun file da spostare! Controlla il percorso di lavoro!")
+                self.labelStatus.setText("Status: Non è stato trovato nessun file da spostare!")
+                message = "Nella cartella attuale non è stato trovato nessun file da spostare:"
+                self.labelList.setText(message)
+        except Exception as ex:
+            message = "\nSi è verificata un'eccezione in inspect_dir " + str(ex)
+            print(message)
+            self.labelStatus.setText(message)
+
+    def onClicked(self, item):
         #QMessageBox.information(self, "Info", item.text())
         try:
             self.selected = item.text()
             self.labelSelected.setText(self.selected)
 
         except Exception as ex:
-            message = "\nSi è verificata un'eccezione" + str(ex)
+            message = "\nSi è verificata un'eccezione in onClicked" + str(ex)
             print(message)
             self.labelStatus.setText(message)
 
 
-    def onClickDelete(self):
-        try:
-            filepath = self.selected.split("\t")[1]
-
-            ret = QMessageBox.question(self, 'Stai per cancellare dei file!', "Stai per cancellare " + filepath + " , vuoi procedere?", QMessageBox.Yes | QMessageBox.Cancel)
-            if ret == QMessageBox.Yes:
-                print('Button QMessageBox.Yes clicked.')
-                index = self.listWidget.currentRow()
-                self.listWidget.takeItem(index)
-                os.remove(filepath)
-                self.labelStatus.setText("Status: " + filepath + " ELIMINATO!")
-
-        except Exception as ex:
-            message = "\nSi è verificata un'eccezione" + str(ex)
-            print(message)
-            self.labelStatus.setText(message)
-
+    # def onClickDelete(self):
+    #     try:
+    #         filepath = self.selected.split("\t")[1]
+    #
+    #         ret = QMessageBox.question(self, 'Stai per cancellare dei file!', "Stai per cancellare " + filepath + " , vuoi procedere?", QMessageBox.Yes | QMessageBox.Cancel)
+    #         if ret == QMessageBox.Yes:
+    #             print('Button QMessageBox.Yes clicked.')
+    #             index = self.listWidget.currentRow()
+    #             self.listWidget.takeItem(index)
+    #             os.remove(filepath)
+    #             self.labelStatus.setText("Status: " + filepath + " ELIMINATO!")
+    #
+    #     except Exception as ex:
+    #         message = "\nSi è verificata un'eccezione" + str(ex)
+    #         print(message)
+    #         self.labelStatus.setText(message)
 
     def onClickFolder(self):
         try:
-            filepath = self.selected.split("\t")[1]
-            head, tail = os.path.split(filepath)
-            os.startfile(head)
+            os.startfile(self.input_dir)
         except Exception as ex:
-            message = "\nSi è verificata un'eccezione" + str(ex)
+            message = "\nSi è verificata un'eccezione in onClickFolder " + str(ex)
             print(message)
             self.labelStatus.setText(message)
-
 
     def onClickWrite(self):
         try:
@@ -145,101 +232,8 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             print(message)
             self.labelStatus.setText(message)
 
-
-    
-##    def inspect_dir(self, input_dir):
-##        contFile = 0
-##        dirSize = 0
-##
-##        self.input_dir = input_dir
-##
-##        message = "Status: Analizzando la cartella " + self.input_dir
-##        print(message)
-##        self.labelStatus.setText(message)
-##
-##        # carica nomi file da cartella
-##        if os.path.isdir(input_dir):
-##            # FONDAMENTALE
-##            self.listWidget.clear()
-##            self.listOfFiles.clear()
-##
-##
-##            for root,d_names,f_names in os.walk(input_dir):
-##                for fi in f_names:
-##                    try:
-##                        filename = os.path.join(root, fi)
-##
-##                        file = File(filename)
-##                        dirSize += file.size
-##                        self.listOfFiles.append(file)
-##
-##                        contFile += 1
-##                    except Exception as ex:
-##                        message = "Errore analizzando il file: " + filename + "Si è verificata un'eccezione: " + str(ex)
-##                        print(message)
-##                        self.labelStatus.setText(message)
-##
-##            self.dir_size = dirSize
-##
-##            self.listOfFiles.sort(key=lambda x: x.size, reverse=True)
-##            for f in self.listOfFiles:
-##                self.listWidget.addItem(str(f.format_bytes(f.size)) + "\t" + f.path)
-##
-##
-##            self.labelStatus.setText("Status: Pronto!")
-##            message = "Nella cartella attuale (" + File.format_bytes(self, dirSize) + \
-##                      ") sono presenti i seguenti " + str(contFile) + " file:"
-##            self.labelList.setText(message)
-##            if contFile == 0:
-##                self.listWidget.clear()
-##                self.listWidget.addItem("Non è stato trovato nessun file! Controlla il percorso di lavoro!")
-##                self.labelStatus.setText("Status: Non è stato trovato nessun file!")
-
-    def init_dir(self, input_dir):
-        try:
-            self.listOfFiles.clear()
-            self.listWidget.clear()
-            
-            self.input_dir = input_dir
-            
-            res = inspect_dir(input_dir)
-
-            contFile = 0
-            dirSize = 0
-            for f in res:
-                contFile += 1
-                dirSize += f.size
-                self.listOfFiles.append(f)
-                self.listWidget.addItem(str(f.format_bytes(f.size)) + "\t" + f.path)
-
-            self.dir_size = dirSize
-            
-            message = "Nella cartella attuale (" + File.format_bytes(self, dirSize) + \
-                      ") sono presenti i seguenti " + str(contFile) + " file:"
-            self.labelList.setText(message)
-            if contFile == 0:
-                self.listWidget.clear()
-                self.listWidget.addItem("Non è stato trovato nessun file! Controlla il percorso di lavoro!")
-                self.labelStatus.setText("Status: Non è stato trovato nessun file!")
-                            
-        except Exception as ex:
-            message = "\nSi è verificata un'eccezione in choose_dir " + str(ex)
-            print(message)
-            self.labelStatus.setText(message)
-
-
-    def choose_dir(self):
-        try:
-            self.input_dir = QFileDialog.getExistingDirectory(self, "Scegli la cartella da analizzare", self.input_dir)
-            self.labelPath.setText(self.input_dir)
-
-            self.init_dir(self.input_dir)
-            
-        except Exception as ex:
-            message = "\nSi è verificata un'eccezione in choose_dir " + str(ex)
-            print(message)
-            self.labelStatus.setText(message)
-
+    # def refresh_dir(self):
+    #     self.init_dir(self, self.input_dir)
 
 
 if __name__ == "__main__":
