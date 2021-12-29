@@ -44,6 +44,7 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     dir_size = 0
     selected = ""
     listOfFiles = []
+    list_moved = []
 
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
@@ -56,7 +57,7 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.buttonFolder.clicked.connect(self.onClickFolder)
         self.buttonMove.clicked.connect(self.move_to_dirs)
         self.buttonOpenFile.clicked.connect(self.onClickOpen)
-        #self.buttonWrite.clicked.connect(self.onClickWrite)
+        self.buttonWrite.clicked.connect(self.onClickWrite)
 
         self.buttonDirChooser.clicked.connect(self.choose_dir)
         #self.buttonRefresh.clicked.connect(self.refresh_dir)
@@ -68,22 +69,13 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         
         self.setStyleSheet("MyWindow{ background-color: rgb(54, 54, 54);}")
 
-    def onClickOpen(self):
-        try:
-            if self.selected:
-                os.startfile(self.selected)
-            else:
-                message = "\nStatus: Nessun file selezionato, seleziona un file prima!"
-                self.labelStatus.setText(message)
-        except Exception as ex:
-            message = "\nSi è verificata un'eccezione in onClickOpen " + str(ex)
-            print(message)
-            self.labelStatus.setText(message)
+
 
     def move_to_dirs(self):
         res = ORDINA_FILE.OrdinaFile(self.input_dir)
         res.analyze_dir()
         listMoved = res.move_to_dirs()
+        self.list_moved = listMoved
         lenList = len(listMoved)
 
         labelStatusMessage = ""
@@ -116,7 +108,7 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.labelPath.setText(self.input_dir)
 
         except Exception as ex:
-            message = "\nSi è verificata un'eccezione in init_dir " + str(ex)
+            message = "Si è verificata un'eccezione in init_dir " + str(ex)
             print(message)
             self.labelStatus.setText(message)
 
@@ -126,7 +118,7 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.init_dir(self.input_dir)
 
         except Exception as ex:
-            message = "\nSi è verificata un'eccezione in choose_dir " + str(ex)
+            message = "Si è verificata un'eccezione in choose_dir " + str(ex)
             print(message)
             self.labelStatus.setText(message)
 
@@ -141,6 +133,7 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             message = "Status: Analizzando la cartella " + self.input_dir
             self.labelStatus.setText(message)
 
+            self.listOfFiles = res.listOfFiles
             self.listWidget.addItems(res.listOfFiles)
             lenListOfFiles = len(res.listOfFiles)
             if lenListOfFiles > 0:
@@ -155,7 +148,7 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 message = "Nella cartella attuale non è stato trovato nessun file da spostare:"
                 self.labelList.setText(message)
         except Exception as ex:
-            message = "\nSi è verificata un'eccezione in inspect_dir " + str(ex)
+            message = "Si è verificata un'eccezione in inspect_dir " + str(ex)
             print(message)
             self.labelStatus.setText(message)
 
@@ -166,7 +159,7 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.labelSelected.setText(self.selected)
 
         except Exception as ex:
-            message = "\nSi è verificata un'eccezione in onClicked" + str(ex)
+            message = "Si è verificata un'eccezione in onClicked" + str(ex)
             print(message)
             self.labelStatus.setText(message)
 
@@ -188,11 +181,23 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     #         print(message)
     #         self.labelStatus.setText(message)
 
+    def onClickOpen(self):
+        try:
+            if self.selected:
+                os.startfile(self.selected)
+            else:
+                message = "Status: Nessun file selezionato, seleziona un file prima!"
+                self.labelStatus.setText(message)
+        except Exception as ex:
+            message = "Si è verificata un'eccezione in onClickOpen " + str(ex)
+            print(message)
+            self.labelStatus.setText(message)
+
     def onClickFolder(self):
         try:
             os.startfile(self.input_dir)
         except Exception as ex:
-            message = "\nSi è verificata un'eccezione in onClickFolder " + str(ex)
+            message = "Si è verificata un'eccezione in onClickFolder " + str(ex)
             print(message)
             self.labelStatus.setText(message)
 
@@ -204,16 +209,25 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             suffix = "_results.txt"
             filename = prefix + suffix
 
-            with open(filename, "a") as file:
-                file.write("\n---------- Analisi di " + self.input_dir + " (" +
-                    File.format_bytes(self, self.dir_size) + ")  ----------\n\n")
+            caption = ""
+            source = []
 
-                for elem in self.listOfFiles:
+            if len(self.list_moved) > 0:
+                caption = "\n---------- File spostati da " + self.input_dir + " ----------\n\n"
+                source = self.list_moved
+            else:
+                caption = "\n---------- Analisi file che vorrei spostare da " + self.input_dir + " ----------\n\n"
+                source = self.listOfFiles
+
+            with open(filename, "a") as file:
+                file.write(caption)
+
+                for elem in source:
                     try:
                         file.write(str(elem))
                         file.write("\n")
                     except Exception as ex:
-                        message = "\nSi è verificata un'eccezione scrivendo: " + str(elem) + "\n" + str(ex)
+                        message = "Si è verificata un'eccezione scrivendo: " + str(elem) + "\n" + str(ex)
                         print(message)
                         self.labelStatus.setText(message)
 
@@ -228,7 +242,7 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.labelStatus.setText("Status: File scritto correttamente!")
 
         except Exception as ex:
-            message = "\nSi è verificata un'eccezione in onClickWrite " + str(ex)
+            message = "Si è verificata un'eccezione in onClickWrite " + str(ex)
             print(message)
             self.labelStatus.setText(message)
 
