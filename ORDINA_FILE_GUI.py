@@ -69,32 +69,36 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         
         self.setStyleSheet("MyWindow{ background-color: rgb(54, 54, 54);}")
 
-
-
     def move_to_dirs(self):
-        res = ORDINA_FILE.OrdinaFile(self.input_dir)
-        res.analyze_dir()
-        listMoved = res.move_to_dirs()
-        self.list_moved = listMoved
-        lenList = len(listMoved)
+        if len(self.listOfFiles) > 0:
+            ret = QMessageBox.question(self, 'Stai per spostare dei file!', "Stai per spostare dei file, vuoi procedere?", QMessageBox.Yes | QMessageBox.Cancel)
+            if ret == QMessageBox.Yes:
+                print('Button QMessageBox.Yes clicked.')
+                res = ORDINA_FILE.OrdinaFile(self.input_dir)
+                res.analyze_dir()
+                listMoved = res.move_to_dirs()
+                self.list_moved = listMoved
+                lenList = len(listMoved)
 
-        labelStatusMessage = ""
-        labelListMessage = ""
-        if lenList > 0:
-            self.listWidget.clear()
-            self.listWidget.addItems(listMoved)
+                labelStatusMessage = ""
+                labelListMessage = ""
+                if lenList > 0:
+                    self.listWidget.clear()
+                    self.listWidget.addItems(listMoved)
 
-            labelStatusMessage = "Status: " + str(lenList) + " file spostati!"
-            labelListMessage = "I seguenti " + str(lenList) + " file sono stati spostati in questo percorso:"
+                    labelStatusMessage = "Status: " + str(lenList) + " file spostati!"
+                    labelListMessage = "I seguenti " + str(lenList) + " file sono stati spostati in questo percorso:"
+                else:
+                    self.listWidget.clear()
+                    self.listWidget.addItem("Non è stato spostato nessun file! Controlla il percorso di lavoro!")
+
+                    labelListMessage = "Si è verificato un errore e nessun file è stato spostato!"
+                    labelStatusMessage = "Status: Non è stato spostato nessun file!"
+
+                self.labelList.setText(labelListMessage)
+                self.labelStatus.setText(labelStatusMessage)
         else:
-            self.listWidget.clear()
-            self.listWidget.addItem("Non è stato spostato e nessun file! Controlla il percorso di lavoro!")
-
-            labelListMessage = "Si è verificato un errore nessun file è stato spostato!"
-            labelStatusMessage = "Status: Non è stato spostato nessun file!"
-
-        self.labelList.setText(labelListMessage)
-        self.labelStatus.setText(labelStatusMessage)
+            QMessageBox.information(self, "Info", "Nel percorso attuale non ci sono file da spostare!")
 
     def init_dir(self, input_dir):
         try:
@@ -139,7 +143,6 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             if lenListOfFiles > 0:
                 self.labelStatus.setText("Status: Pronto!")
                 message = "Nella cartella attuale sono presenti i seguenti " + str(lenListOfFiles) + " file che vorrei spostare:"
-
                 self.labelList.setText(res.message)
             else:
                 self.listWidget.clear()
@@ -188,6 +191,8 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             else:
                 message = "Status: Nessun file selezionato, seleziona un file prima!"
                 self.labelStatus.setText(message)
+                QMessageBox.information(self, "Info", message)
+
         except Exception as ex:
             message = "Si è verificata un'eccezione in onClickOpen " + str(ex)
             print(message)
@@ -203,43 +208,50 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def onClickWrite(self):
         try:
-            date_time = datetime.now().strftime("%m%d%Y%H%M%S")
 
-            prefix = date_time
-            suffix = "_results.txt"
-            filename = prefix + suffix
+                date_time = datetime.now().strftime("%m%d%Y%H%M%S")
 
-            caption = ""
-            source = []
+                prefix = date_time
+                suffix = "_results.txt"
+                filename = prefix + suffix
 
-            if len(self.list_moved) > 0:
-                caption = "\n---------- File spostati da " + self.input_dir + " ----------\n\n"
-                source = self.list_moved
-            else:
-                caption = "\n---------- Analisi file che vorrei spostare da " + self.input_dir + " ----------\n\n"
-                source = self.listOfFiles
+                caption = ""
+                source = []
 
-            with open(filename, "a") as file:
-                file.write(caption)
+                if len(self.list_moved) > 0:
+                    message = "Stai per scrivere la lista dei file spostati su file, vuoi procedere?"
+                    caption = "\n---------- File spostati da " + self.input_dir + " ----------\n\n"
+                    source = self.list_moved
+                else:
+                    message = "Se procedi ora, scriverai l'analisi della cartella (non sono stati ancora spostati file), vuoi procedere?"
+                    caption = "\n---------- Analisi file che vorrei spostare da " + self.input_dir + " ----------\n\n"
+                    source = self.listOfFiles
 
-                for elem in source:
-                    try:
-                        file.write(str(elem))
-                        file.write("\n")
-                    except Exception as ex:
-                        message = "Si è verificata un'eccezione scrivendo: " + str(elem) + "\n" + str(ex)
-                        print(message)
-                        self.labelStatus.setText(message)
+                ret = QMessageBox.question(self, 'Stai per scrivere su file!', message ,
+                                           QMessageBox.Yes | QMessageBox.Cancel)
+                if ret == QMessageBox.Yes:
+                    print('Button QMessageBox.Yes clicked.')
+                    with open(filename, "a") as file:
+                        file.write(caption)
+
+                        for elem in source:
+                            try:
+                                file.write(str(elem))
+                                file.write("\n")
+                            except Exception as ex:
+                                message = "Si è verificata un'eccezione scrivendo: " + str(elem) + "\n" + str(ex)
+                                print(message)
+                                self.labelStatus.setText(message)
 
 
-            ret = QMessageBox.question(self, 'File scritto correttamente!', "File scritto correttamente!\n\nLo trovi in " +
-                                       os.path.join(self.input_dir, filename) + "\n\nLo vuoi aprire subito?",
-                                       QMessageBox.Yes | QMessageBox.Cancel)
-            if ret == QMessageBox.Yes:
-                print('Button QMessageBox.Yes clicked.')
-                os.startfile(filename)
+                    ret = QMessageBox.question(self, 'File scritto correttamente!', "File scritto correttamente!\n\nLo trovi in " +
+                                               os.path.join(self.input_dir, filename) + "\n\nLo vuoi aprire subito?",
+                                               QMessageBox.Yes | QMessageBox.Cancel)
+                    if ret == QMessageBox.Yes:
+                        print('Button QMessageBox.Yes clicked.')
+                        os.startfile(filename)
 
-            self.labelStatus.setText("Status: File scritto correttamente!")
+                    self.labelStatus.setText("Status: File scritto correttamente!")
 
         except Exception as ex:
             message = "Si è verificata un'eccezione in onClickWrite " + str(ex)

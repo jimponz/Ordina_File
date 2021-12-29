@@ -63,7 +63,7 @@
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(150, 150, 150);</string>
+     <string notr="true">background-color: rgb(214, 214, 0);</string>
     </property>
     <property name="text">
      <string>Cambia percorso..</string>
@@ -229,7 +229,7 @@ background-color: rgb(120, 120, 120);</string>
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(150, 150, 150);</string>
+     <string notr="true">background-color: rgb(214, 214, 0);</string>
     </property>
     <property name="text">
      <string>Sposta file</string>
@@ -281,7 +281,7 @@ background-color: rgb(120, 120, 120);</string>
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(120, 120, 120);</string>
+     <string notr="true">background-color: rgb(150, 150, 150);</string>
     </property>
     <property name="text">
      <string>Apri percorso</string>
@@ -311,7 +311,7 @@ background-color: rgb(120, 120, 120);</string>
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(120, 120, 120);</string>
+     <string notr="true">background-color: rgb(150, 150, 150);</string>
     </property>
     <property name="text">
      <string>Scrivi risultati su file</string>
@@ -342,36 +342,6 @@ background-color: rgb(120, 120, 120);</string>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(150, 150, 150);</string>
-    </property>
-    <property name="text">
-     <string>Apri file</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="buttonOpenFile">
-    <property name="geometry">
-     <rect>
-      <x>1070</x>
-      <y>530</y>
-      <width>111</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="font">
-     <font>
-      <family>Verdana</family>
-      <pointsize>10</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color: rgb(120, 120, 120);</string>
     </property>
     <property name="text">
      <string>Apri file</string>
