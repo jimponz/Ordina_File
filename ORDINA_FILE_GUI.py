@@ -20,17 +20,17 @@ class File:
     path = ""
     size = 0
 
-    def format_bytes(self,size):
+    def format_bytes(self, size):
         # 2**10 = 1024
         power = 2**10
         n = 0
-        power_labels = {0 : '', 1: 'K', 2: 'M', 3: 'G', 4: 'T'}
+        power_labels = {0: '', 1: 'K', 2: 'M', 3: 'G', 4: 'T'}
         while size > power:
             size /= power
             n += 1
-        return str(round(size,2)) + " " + power_labels[n]+'B'
+        return str(round(size, 2)) + " " + power_labels[n]+'B'
 
-    def __init__(self,path):
+    def __init__(self, path):
         if os.path.isfile(path):
             self.path = path
             self.size = os.stat(path).st_size
@@ -57,6 +57,7 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.buttonFolder.clicked.connect(self.onClickFolder)
         self.buttonMove.clicked.connect(self.move_to_dirs)
         self.buttonOpenFile.clicked.connect(self.onClickOpen)
+        self.buttonDelete.clicked.connect(self.onClickDelete)
         self.buttonWrite.clicked.connect(self.onClickWrite)
 
         self.buttonDirChooser.clicked.connect(self.choose_dir)
@@ -167,22 +168,22 @@ class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.labelStatus.setText(message)
 
 
-    # def onClickDelete(self):
-    #     try:
-    #         filepath = self.selected.split("\t")[1]
-    #
-    #         ret = QMessageBox.question(self, 'Stai per cancellare dei file!', "Stai per cancellare " + filepath + " , vuoi procedere?", QMessageBox.Yes | QMessageBox.Cancel)
-    #         if ret == QMessageBox.Yes:
-    #             print('Button QMessageBox.Yes clicked.')
-    #             index = self.listWidget.currentRow()
-    #             self.listWidget.takeItem(index)
-    #             os.remove(filepath)
-    #             self.labelStatus.setText("Status: " + filepath + " ELIMINATO!")
-    #
-    #     except Exception as ex:
-    #         message = "\nSi è verificata un'eccezione" + str(ex)
-    #         print(message)
-    #         self.labelStatus.setText(message)
+    def onClickDelete(self):
+        try:
+            filepath = self.selected
+
+            ret = QMessageBox.question(self, 'Stai per cancellare dei file!', "Stai per cancellare " + filepath + " , vuoi procedere?", QMessageBox.Yes | QMessageBox.Cancel)
+            if ret == QMessageBox.Yes:
+                print('Button QMessageBox.Yes clicked.')
+                index = self.listWidget.currentRow()
+                self.listWidget.takeItem(index)
+                os.remove(filepath)
+                self.labelStatus.setText("Status: " + filepath + " ELIMINATO!")
+
+        except Exception as ex:
+            message = "\nSi è verificata un'eccezione in onClickDelete" + str(ex)
+            print(message)
+            self.labelStatus.setText(message)
 
     def onClickOpen(self):
         try:
