@@ -11,7 +11,7 @@ def move_ext_to_dirs(path):
         if not os.path.isdir(os.path.join(path,f)):
             filename,fileext = os.path.splitext(f)
             if fileext != ".lnk" and fileext != "" and fileext != ".ini" and fileext != ".crdownload":
-                if f != "ORDINA_FILE.py" and f != "ORDINA_FILE.exe" :
+                if f != "ORDINA_FILE_AUTO_DOUBLECLICK.py" and f != "ORDINA_FILE.exe" :
                     totalSize += os.stat(os.path.join(path,f)).st_size
                     ordpath = os.path.join(path,"ORDINATI")
                     create_dir(ordpath)
