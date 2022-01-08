@@ -32,6 +32,7 @@ dire = os.path.join(home,"Documents")
 dire = os.path.join(home,"Downloads")
 #move_ext_to_dirs(dire)
 
-move_ext_to_dirs(os.getcwd())
+dire = os.getcwd()
+move_ext_to_dirs(dire)
 
 input("\nPremi INVIO per uscire")
